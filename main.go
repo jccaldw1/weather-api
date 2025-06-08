@@ -43,21 +43,44 @@ func main() {
 	}
 }
 
+type Response struct {
+	Date         string  `json:"date"`
+	High         float32 `json:"high"`
+	Low          float32 `json:"low"`
+	DaysAhead    int     `json:"days_ahead"`
+	DateRecorded string  `json:"date_recorded"`
+}
+
 func GetDateHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Getting records for the passed date (year, month, day)")
 	date := r.PathValue("date")
-	fmt.Println(date)
-	err := globalDb.Ping()
+	query := fmt.Sprintf("SELECT * FROM \"WeatherRecord\" WHERE date = '%s'", date)
+	rows, err := globalDb.Query(query)
 	if err != nil {
 		log.Fatal(err)
 	}
-	rows, err := globalDb.Query("SELECT * FROM \"WeatherRecord\" WHERE date = " + string(date))
-	if err != nil {
-		log.Fatal(err)
+	defer rows.Close()
+
+	var jsonResponse []Response
+
+	for rows.Next() {
+		var id int
+		var date string
+		var high float32
+		var low float32
+		var daysAhead int
+		var dateRecorded string
+
+		err := rows.Scan(&id, &date, &high, &low, &daysAhead, &dateRecorded)
+		if err != nil {
+			log.Fatal("Could not scan row: ", err)
+		}
+		jsonResponse = append(jsonResponse, Response{date, high, low, daysAhead, dateRecorded})
 	}
-	fmt.Println(rows)
 
 	w.WriteHeader(http.StatusOK)
+
+	json.NewEncoder(w).Encode(jsonResponse)
 }
 
 func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
