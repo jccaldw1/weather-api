@@ -82,17 +82,3 @@ func GetDateHandler(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(jsonResponse)
 }
-
-func helloWorldHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("HelloWorld")
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	response := struct {
-		Key string `json:"keyy"`
-	}{
-		Key: "hello",
-	}
-
-	json.NewEncoder(w).Encode(response)
-}
