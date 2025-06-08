@@ -34,7 +34,6 @@ func main() {
 	fmt.Println("after ping 1")
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", helloWorldHandler)
 	mux.HandleFunc("/date/{date}", GetDateHandler)
 
 	err = http.ListenAndServe(":8080", mux)
