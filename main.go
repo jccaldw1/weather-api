@@ -77,6 +77,7 @@ func GetDateHandler(w http.ResponseWriter, r *http.Request) {
 		jsonResponse = append(jsonResponse, Response{date, high, low, daysAhead, dateRecorded})
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
 	json.NewEncoder(w).Encode(jsonResponse)
