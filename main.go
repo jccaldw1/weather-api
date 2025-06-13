@@ -114,8 +114,12 @@ func GetDateHandler(w http.ResponseWriter, r *http.Request) {
 				Date:         response.Date,
 				DaysAhead:    response.DaysAhead,
 				HighMargin:   (response.High - todayActualHigh) / todayActualHigh,
-				LowMargin: (response.Low - todayActualLow) / todayActualLow
+				LowMargin:    (response.Low - todayActualLow) / todayActualLow,
 			})
+		}
+
+		for _, margin := range margins {
+
 		}
 	}
 }
