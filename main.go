@@ -85,21 +85,37 @@ func GetDateHandler(w http.ResponseWriter, r *http.Request) {
 	// Now that we've sent back the response, we should also send back metrics to the database (the metrics are lazily evaluated).
 
 	haveDataForToday := false
-	todayActualHigh := 0
-	todayActualLow := 0
+	var todayActualHigh float32
+	var todayActualLow float32
 
 	for _, response := range jsonResponse {
 		if response.DaysAhead == 0 {
 			haveDataForToday = true
-			todayActualHigh = int(response.High)
-			todayActualLow = int(response.Low)
+			todayActualHigh = response.High
+			todayActualLow = response.Low
 			break
 		}
 	}
 
 	if haveDataForToday {
-		for _, response := range jsonResponse {
+		type Margin struct {
+			DateRecorded string  `json:"date_recorded"`
+			Date         string  `json:"date"`
+			DaysAhead    int     `json:"days_ahead"`
+			HighMargin   float32 `json:"high_margin"`
+			LowMargin    float32 `json:"low_margin"`
+		}
 
+		var margins []Margin
+
+		for _, response := range jsonResponse {
+			margins = append(margins, Margin{
+				DateRecorded: response.DateRecorded,
+				Date:         response.Date,
+				DaysAhead:    response.DaysAhead,
+				HighMargin:   (response.High - todayActualHigh) / todayActualHigh,
+				LowMargin: (response.Low - todayActualLow) / todayActualLow
+			})
 		}
 	}
 }
