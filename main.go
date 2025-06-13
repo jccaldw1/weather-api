@@ -81,4 +81,25 @@ func GetDateHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	json.NewEncoder(w).Encode(jsonResponse)
+
+	// Now that we've sent back the response, we should also send back metrics to the database (the metrics are lazily evaluated).
+
+	haveDataForToday := false
+	todayActualHigh := 0
+	todayActualLow := 0
+
+	for _, response := range jsonResponse {
+		if response.DaysAhead == 0 {
+			haveDataForToday = true
+			todayActualHigh = int(response.High)
+			todayActualLow = int(response.Low)
+			break
+		}
+	}
+
+	if haveDataForToday {
+		for _, response := range jsonResponse {
+
+		}
+	}
 }
